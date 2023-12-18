@@ -21,7 +21,7 @@ async fn main(_spawner: Spawner) {
     loop {
         info!("led on!");
         led.set_high();
-        Timer::after_secs(1).await;
+        Timer::after_secs(10).await;
 
         info!("led off!");
         led.set_low();

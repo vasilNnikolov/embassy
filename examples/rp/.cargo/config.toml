@@ -1,5 +1,8 @@
-[target.'cfg(all(target_arch = "arm", target_os = "none"))']
-runner = "probe-rs run --chip RP2040"
+# commenting this out as I don't have  a debug probe
+# [target.'cfg(all(target_arch = "arm", target_os = "none"))']
+# runner = "probe-rs run --chip RP2040" 
+[target.thumbv6m-none-eabi]
+runner = "elf2uf2-rs -d"
 
 [build]
 target = "thumbv6m-none-eabi"        # Cortex-M0 and Cortex-M0+
