@@ -5,26 +5,25 @@ use core::cell::RefCell;
 use defmt::*;
 use embassy_executor::Spawner;
 use embassy_rp::gpio;
-use embassy_rp::peripherals::PIN_25;
 use embassy_sync::blocking_mutex::raw::*;
 use embassy_sync::mutex::Mutex;
 use embassy_time::Duration;
 use embassy_time::Timer;
-use gpio::{Level, Output};
+use gpio::{AnyPin, Level, Output};
 use {defmt_rtt as _, panic_probe as _};
 
-type LedType = Mutex<ThreadModeRawMutex, RefCell<Option<Output<'static, PIN_25>>>>;
+type LedType = Mutex<ThreadModeRawMutex, RefCell<Option<Output<'static, AnyPin>>>>;
 static LED: LedType = Mutex::new(RefCell::new(None));
 
 #[embassy_executor::main]
 async fn main(spawner: Spawner) {
     let p = embassy_rp::init(Default::default());
-    let led = Output::new(p.PIN_25, Level::High);
+    let led = Output::new(AnyPin::from(p.PIN_25), Level::High);
     {
         *(LED.lock().await) = RefCell::new(Some(led));
     }
     let dt = 100 * 1000;
-    let k = 1.014;
+    let k = 1.005;
 
     unwrap!(spawner.spawn(toggle(&LED, Duration::from_micros(dt))));
     unwrap!(spawner.spawn(toggle2(&LED, Duration::from_micros((dt as f32 * k) as u64))));
