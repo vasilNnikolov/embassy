@@ -7,7 +7,7 @@ use embassy_rp::{gpio, PeripheralRef};
 use embassy_sync::blocking_mutex::raw::ThreadModeRawMutex;
 use embassy_sync::mutex::Mutex;
 use embassy_time::Duration;
-use embassy_time::Timer;
+use embassy_time::{Ticker, Timer};
 use gpio::{AnyPin, Level, Output};
 use {defmt_rtt as _, panic_probe as _};
 
@@ -22,14 +22,18 @@ async fn main(spawner: Spawner) {
     {
         *(LED.lock().await) = Some(PeripheralRef::new(led));
     }
-    let dt = 100 * 1000;
-    let k = 1.015;
+    let dt = 100 * 1_000_000;
+    let k = 1.003;
 
-    unwrap!(spawner.spawn(toggle(&LED, Duration::from_micros(dt))));
-    unwrap!(spawner.spawn(toggle2(&LED, Duration::from_micros((dt as f64 * k) as u64))));
+    unwrap!(spawner.spawn(toggle(&LED, Duration::from_nanos(dt))));
+    unwrap!(spawner.spawn(toggle_slightly_slower(
+        &LED,
+        Duration::from_nanos((dt as f64 * k) as u64)
+    )));
 }
 
 async fn toggle_led(led: &'static LedType, delay: Duration) {
+    let mut ticker = Ticker::every(delay);
     loop {
         {
             let mut led_unlocked = led.lock().await;
@@ -37,7 +41,8 @@ async fn toggle_led(led: &'static LedType, delay: Duration) {
                 pin_ref.toggle();
             }
         }
-        Timer::after(delay).await;
+        // Timer::after(delay).await;
+        ticker.next().await;
     }
 }
 #[embassy_executor::task]
@@ -46,6 +51,6 @@ async fn toggle(led: &'static LedType, delay: Duration) {
 }
 
 #[embassy_executor::task]
-async fn toggle2(led: &'static LedType, delay: Duration) {
+async fn toggle_slightly_slower(led: &'static LedType, delay: Duration) {
     toggle_led(led, delay).await
 }
