@@ -1,6 +1,10 @@
 #![no_std]
 #![no_main]
-
+/// This example demonstrates how to access a given pin from more than one embassy task
+/// The on-board LED is toggled by two tasks with slightly different periods, leading to the
+/// apparent duty cycle of the LED increasing, then decreasing, linearly. The phenomenon is similar
+/// to interference and the 'beats' you can hear if you play two frequencies close to one another
+/// [Link explaining it](https://www.physicsclassroom.com/class/sound/Lesson-3/Interference-and-Beats)
 use defmt::*;
 use embassy_executor::Spawner;
 use embassy_rp::{gpio, PeripheralRef};
@@ -19,6 +23,8 @@ async fn main(spawner: Spawner) {
     let p = embassy_rp::init(Default::default());
     // set the content of the global LED reference to the real LED pin
     let led = Output::new(AnyPin::from(p.PIN_25), Level::High);
+    // inner scope is so that once the mutex is written to, the MutexGuard is dropped, thus the
+    // Mutex is released
     {
         *(LED.lock().await) = Some(PeripheralRef::new(led));
     }
@@ -41,7 +47,6 @@ async fn toggle_led(led: &'static LedType, delay: Duration) {
                 pin_ref.toggle();
             }
         }
-        // Timer::after(delay).await;
         ticker.next().await;
     }
 }
