@@ -25,24 +25,12 @@ type ChannelType = Mutex<ThreadModeRawMutex, RefCell<Channel<ThreadModeRawMutex,
 
 static RF_CHANNEL: ChannelType = Mutex::new(RefCell::new(Channel::new()));
 
+// TODO implement a global command queue that all command input streams push to
+
 #[derive(Serialize, Deserialize)]
 enum Command {
     Config(Config),
     TransmitByte(u8),
-}
-
-#[derive(Serialize, Deserialize)]
-struct Config {
-    /// Transmit freqency, Hz
-    tx_freq: u64,
-    /// Receive freqency, Hz
-    rx_freq: u64,
-}
-
-impl Config {
-    fn default() -> Self {
-        Config { tx_freq: 1, rx_freq: 1 }
-    }
 }
 
 impl Command {
@@ -61,6 +49,14 @@ trait CommandInput {
     async fn get_command(&mut self) -> Command;
 }
 
+#[derive(Serialize, Deserialize)]
+struct Config {
+    /// Transmit freqency, Hz
+    tx_freq: u64,
+    /// Receive freqency, Hz
+    rx_freq: u64,
+}
+
 /// dummy Input source that sends random data every second
 struct RandomInput;
 
@@ -76,6 +72,17 @@ impl CommandInput for RandomInput {
         } else {
             return Command::TransmitByte(5 as u8);
         }
+    }
+}
+
+struct NoInput;
+
+impl CommandInput for NoInput {
+    async fn get_command(&mut self) -> Command {
+        loop {
+            Timer::after_secs(2).await;
+        }
+        return Command::Config(Config { tx_freq: 1, rx_freq: 2 });
     }
 }
 
@@ -102,11 +109,10 @@ async fn main(spawner: Spawner) {
         *(LED.lock().await) = Some(PeripheralRef::new(led));
     }
     unwrap!(spawner.spawn(working_indicator(&LED, Duration::from_millis(500))));
-    let mut no_input_stream = RandomInput {};
+    let mut random_input_stream = RandomInput {};
 
     loop {
-        match no_input_stream.get_command().await {
-            // Command::Config(_c) => fast_blink(&LED, Duration::from_millis(50)).await,
+        match random_input_stream.get_command().await {
             Command::Config(_c) => match spawner.spawn(fast_blink(&LED, Duration::from_millis(50))) {
                 Ok(_) => (),
                 Err(_) => (),
