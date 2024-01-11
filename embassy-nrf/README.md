@@ -8,6 +8,26 @@ complete operations in low power mod and handling interrupts, so that applicatio
 
 NOTE: The Embassy HALs can be used both for non-async and async operations. For async, you can choose which runtime you want to use.
 
+For a complete list of available peripherals and features, see the [embassy-nrf documentation](https://docs.embassy.dev/embassy-nrf).
+
+## Hardware support
+
+The `embassy-nrf` HAL supports most variants of the nRF family:
+
+* nRF52 ([examples](https://github.com/embassy-rs/embassy/tree/main/examples/nrf52840))
+* nRF53 ([examples](https://github.com/embassy-rs/embassy/tree/main/examples/nrf5340))
+* nRF91 ([examples](https://github.com/embassy-rs/embassy/tree/main/examples/nrf9160))
+
+Most peripherals are supported. 
+
+## Time driver
+
+If the `time` feature is enabled, the HAL uses the RTC peripheral as a global time driver for [embassy-time](https://crates.io/crates/embassy-time), with a tick rate of 32768 Hz.
+
+## Embedded-hal
+
+The `embassy-nrf` HAL implements the traits from [embedded-hal](https://crates.io/crates/embedded-hal) (v0.2 and 1.0) and [embedded-hal-async](https://crates.io/crates/embedded-hal-async), as well as [embedded-io](https://crates.io/crates/embedded-io) and [embedded-io-async](https://crates.io/crates/embedded-io-async).
+
 ## EasyDMA considerations
 
 On nRF chips, peripherals can use the so called EasyDMA feature to offload the task of interacting
@@ -43,18 +63,3 @@ as the methods without the suffix will be allocating a statically sized buffer (
 
 Note that the methods that read data like [`read`](spim::Spim::read) and [`transfer_in_place`](spim::Spim::transfer_in_place) do not have the corresponding `_from_ram` variants as
 mutable slices always reside in RAM.
-
-## Minimum supported Rust version (MSRV)
-
-Embassy is guaranteed to compile on the latest stable Rust version at the time of release. It might compile with older versions but that may change in any new patch release.
-
-## License
-
-This work is licensed under either of
-
-- Apache License, Version 2.0 ([LICENSE-APACHE](LICENSE-APACHE) or
-  <http://www.apache.org/licenses/LICENSE-2.0>)
-- MIT license ([LICENSE-MIT](LICENSE-MIT) or <http://opensource.org/licenses/MIT>)
-
-at your option.
-

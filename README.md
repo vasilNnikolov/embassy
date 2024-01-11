@@ -136,14 +136,8 @@ please refer to the `.vscode/settings.json` file's `rust-analyzer.linkedProjects
 
 ## Minimum supported Rust version (MSRV)
 
-Embassy is guaranteed to compile on the latest stable Rust version at the time of release. It might compile with older versions but that may change in any new patch release.
-
-Several features require nightly:
-
-- The `#[embassy_executor::main]` and `#[embassy_executor::task]` attribute macros.
-- Async traits
-
-These are enabled by activating the `nightly` Cargo feature. If you do so, Embassy is guaranteed to compile on the exact nightly version specified in `rust-toolchain.toml`. It might compile with older or newer nightly versions, but that may change in any new patch release.
+Embassy is guaranteed to compile on stable Rust 1.75 and up. It *might*
+compile with older versions but that may change in any new patch release.
 
 ## Why the name?
 
@@ -151,13 +145,19 @@ EMBedded ASYnc! :)
 
 ## License
 
-This work is licensed under either of
+Embassy is licensed under either of
 
 - Apache License, Version 2.0 ([LICENSE-APACHE](LICENSE-APACHE) or
   <http://www.apache.org/licenses/LICENSE-2.0>)
 - MIT license ([LICENSE-MIT](LICENSE-MIT) or <http://opensource.org/licenses/MIT>)
 
 at your option.
+
+## Contribution
+
+Unless you explicitly state otherwise, any contribution intentionally submitted
+for inclusion in the work by you, as defined in the Apache-2.0 license, shall be
+dual licensed as above, without any additional terms or conditions.
 
 [1]: https://github.com/embassy-rs/embassy/wiki/Getting-Started
 [2]: https://github.com/embassy-rs/embassy/wiki/Running-the-Examples

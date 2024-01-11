@@ -1,6 +1,4 @@
 #![cfg_attr(not(any(feature = "std", feature = "wasm", test)), no_std)]
-#![cfg_attr(nightly, feature(async_fn_in_trait, impl_trait_projections))]
-#![cfg_attr(nightly, allow(stable_features, unknown_lints))]
 #![allow(async_fn_in_trait)]
 #![doc = include_str!("../README.md")]
 #![allow(clippy::new_without_default)]
@@ -12,12 +10,12 @@
 // This mod MUST go first, so that the others see its macros.
 pub(crate) mod fmt;
 
+pub use embassy_time_driver as driver;
+
 mod delay;
-pub mod driver;
 mod duration;
 mod instant;
 pub mod queue;
-mod tick;
 mod timer;
 
 #[cfg(feature = "mock-driver")]
@@ -34,14 +32,10 @@ mod driver_wasm;
 mod queue_generic;
 
 pub use delay::{block_for, Delay};
+pub use driver::TICK_HZ;
 pub use duration::Duration;
 pub use instant::Instant;
 pub use timer::{with_timeout, Ticker, TimeoutError, Timer};
-
-/// Ticks per second of the global timebase.
-///
-/// This value is specified by the [`tick-*` Cargo features](crate#tick-rate)
-pub const TICK_HZ: u64 = tick::TICK_HZ;
 
 const fn gcd(a: u64, b: u64) -> u64 {
     if b == 0 {
