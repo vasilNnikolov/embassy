@@ -26,7 +26,7 @@ pub async fn fast_blink(led: &'static LedType, delay: Duration) {
     let mut led_unlocked = led.lock().await;
     // take for the whole duration of the fast ticking
     if let Some(pin_ref) = led_unlocked.as_mut() {
-        for _ in 0..50 {
+        for _ in 0..10 {
             (*pin_ref).toggle();
             ticker.next().await
         }
