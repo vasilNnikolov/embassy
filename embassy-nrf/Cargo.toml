@@ -3,6 +3,11 @@ name = "embassy-nrf"
 version = "0.1.0"
 edition = "2021"
 license = "MIT OR Apache-2.0"
+description = "Embassy Hardware Abstraction Layer (HAL) for nRF series microcontrollers"
+keywords = ["embedded", "async", "nordic", "nrf", "embedded-hal"]
+categories = ["embedded", "hardware-support", "no-std", "asynchronous"]
+repository = "https://github.com/embassy-rs/embassy"
+documentation = "https://docs.embassy.dev/embassy-nrf"
 
 [package.metadata.embassy_docs]
 src_base = "https://github.com/embassy-rs/embassy/blob/embassy-nrf-v$VERSION/embassy-nrf/src/"
@@ -14,6 +19,10 @@ flavors = [
     { regex_feature = "nrf53.*", target = "thumbv8m.main-none-eabihf" },
     { regex_feature = "nrf91.*", target = "thumbv8m.main-none-eabihf" },
 ]
+
+[package.metadata.docs.rs]
+features = ["nrf52840", "time", "defmt", "unstable-pac", "gpiote", "time-driver-rtc1"]
+rustdoc-args = ["--cfg", "docsrs"]
 
 [features]
 default = ["rt"]
@@ -111,7 +120,7 @@ _nrf52832_anomaly_109 = []
 
 [dependencies]
 embassy-time-driver = { version = "0.1", path = "../embassy-time-driver", optional = true }
-embassy-time = { version = "0.2", path = "../embassy-time", optional = true }
+embassy-time = { version = "0.3.0", path = "../embassy-time", optional = true }
 embassy-sync = { version = "0.5.0", path = "../embassy-sync" }
 embassy-hal-internal = {version = "0.1.0", path = "../embassy-hal-internal", features = ["cortex-m", "prio-bits-3"] }
 embassy-embedded-hal = {version = "0.1.0", path = "../embassy-embedded-hal" }
