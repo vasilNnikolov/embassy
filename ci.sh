@@ -120,7 +120,7 @@ cargo batch  \
     --- build --release --manifest-path embassy-stm32/Cargo.toml --target thumbv7m-none-eabi --features stm32f378cc,defmt,exti,time-driver-any,time \
     --- build --release --manifest-path embassy-stm32/Cargo.toml --target thumbv6m-none-eabi --features stm32g0c1ve,defmt,exti,time-driver-any,time \
     --- build --release --manifest-path embassy-stm32/Cargo.toml --target thumbv7m-none-eabi --features stm32f217zg,defmt,exti,time-driver-any,time \
-    --- build --release --manifest-path embassy-stm32/Cargo.toml --target thumbv8m.main-none-eabihf --features stm32l552ze,defmt,exti,time-driver-any,time \
+    --- build --release --manifest-path embassy-stm32/Cargo.toml --target thumbv8m.main-none-eabihf --features stm32l552ze,defmt,exti,time-driver-any,low-power,time \
     --- build --release --manifest-path embassy-stm32/Cargo.toml --target thumbv6m-none-eabi --features stm32wl54jc-cm0p,defmt,exti,time-driver-any,time \
     --- build --release --manifest-path embassy-stm32/Cargo.toml --target thumbv7em-none-eabi --features stm32wle5jb,defmt,exti,time-driver-any,time \
     --- build --release --manifest-path embassy-stm32/Cargo.toml --target thumbv7em-none-eabi --features stm32g474pe,defmt,exti,time-driver-any,time \
@@ -221,9 +221,6 @@ rm out/tests/rpi-pico/i2c
 
 rm out/tests/stm32wb55rg/wpan_mac
 rm out/tests/stm32wb55rg/wpan_ble
-
-# not in CI yet.
-rm -rf out/tests/stm32f446re
 
 # unstable, I think it's running out of RAM?
 rm out/tests/stm32f207zg/eth
