@@ -700,7 +700,7 @@ use vals::Mbr as Br;
 
 fn compute_baud_rate(clocks: Hertz, freq: Hertz) -> Br {
     let val = match clocks.0 / freq.0 {
-        0 => unreachable!(),
+        0 => panic!("You are trying to reach a frequency higher than the clock"),
         1..=2 => 0b000,
         3..=5 => 0b001,
         6..=11 => 0b010,
@@ -1005,8 +1005,8 @@ mod word_impl {
 
     pub type Config = vals::Dff;
 
-    impl_word!(u8, vals::Dff::EIGHTBIT);
-    impl_word!(u16, vals::Dff::SIXTEENBIT);
+    impl_word!(u8, vals::Dff::BITS8);
+    impl_word!(u16, vals::Dff::BITS16);
 }
 
 #[cfg(spi_v2)]
@@ -1015,19 +1015,19 @@ mod word_impl {
 
     pub type Config = (vals::Ds, vals::Frxth);
 
-    impl_word!(word::U4, (vals::Ds::FOURBIT, vals::Frxth::QUARTER));
-    impl_word!(word::U5, (vals::Ds::FIVEBIT, vals::Frxth::QUARTER));
-    impl_word!(word::U6, (vals::Ds::SIXBIT, vals::Frxth::QUARTER));
-    impl_word!(word::U7, (vals::Ds::SEVENBIT, vals::Frxth::QUARTER));
-    impl_word!(u8, (vals::Ds::EIGHTBIT, vals::Frxth::QUARTER));
-    impl_word!(word::U9, (vals::Ds::NINEBIT, vals::Frxth::HALF));
-    impl_word!(word::U10, (vals::Ds::TENBIT, vals::Frxth::HALF));
-    impl_word!(word::U11, (vals::Ds::ELEVENBIT, vals::Frxth::HALF));
-    impl_word!(word::U12, (vals::Ds::TWELVEBIT, vals::Frxth::HALF));
-    impl_word!(word::U13, (vals::Ds::THIRTEENBIT, vals::Frxth::HALF));
-    impl_word!(word::U14, (vals::Ds::FOURTEENBIT, vals::Frxth::HALF));
-    impl_word!(word::U15, (vals::Ds::FIFTEENBIT, vals::Frxth::HALF));
-    impl_word!(u16, (vals::Ds::SIXTEENBIT, vals::Frxth::HALF));
+    impl_word!(word::U4, (vals::Ds::BITS4, vals::Frxth::QUARTER));
+    impl_word!(word::U5, (vals::Ds::BITS5, vals::Frxth::QUARTER));
+    impl_word!(word::U6, (vals::Ds::BITS6, vals::Frxth::QUARTER));
+    impl_word!(word::U7, (vals::Ds::BITS7, vals::Frxth::QUARTER));
+    impl_word!(u8, (vals::Ds::BITS8, vals::Frxth::QUARTER));
+    impl_word!(word::U9, (vals::Ds::BITS9, vals::Frxth::HALF));
+    impl_word!(word::U10, (vals::Ds::BITS10, vals::Frxth::HALF));
+    impl_word!(word::U11, (vals::Ds::BITS11, vals::Frxth::HALF));
+    impl_word!(word::U12, (vals::Ds::BITS12, vals::Frxth::HALF));
+    impl_word!(word::U13, (vals::Ds::BITS13, vals::Frxth::HALF));
+    impl_word!(word::U14, (vals::Ds::BITS14, vals::Frxth::HALF));
+    impl_word!(word::U15, (vals::Ds::BITS15, vals::Frxth::HALF));
+    impl_word!(u16, (vals::Ds::BITS16, vals::Frxth::HALF));
 }
 
 #[cfg(any(spi_v3, spi_v4, spi_v5))]

@@ -12,8 +12,6 @@ use embassy_usb_driver::{
     Direction, EndpointAddress, EndpointAllocError, EndpointError, EndpointInfo, EndpointType, Event, Unsupported,
 };
 
-use super::{DmPin, DpPin, Instance};
-use crate::interrupt::typelevel::Interrupt;
 use crate::pac::usb::regs;
 use crate::pac::usb::vals::{EpType, Stat};
 use crate::pac::USBRAM;
@@ -259,18 +257,10 @@ impl<'d, T: Instance> Driver<'d, T> {
         dm: impl Peripheral<P = impl DmPin<T>> + 'd,
     ) -> Self {
         into_ref!(dp, dm);
-        T::Interrupt::unpend();
-        unsafe { T::Interrupt::enable() };
+
+        super::common_init::<T>();
 
         let regs = T::regs();
-
-        #[cfg(any(stm32l5, stm32wb))]
-        crate::pac::PWR.cr2().modify(|w| w.set_usv(true));
-
-        #[cfg(pwr_h5)]
-        crate::pac::PWR.usbscr().modify(|w| w.set_usb33sv(true));
-
-        <T as RccPeripheral>::enable_and_reset();
 
         regs.cntr().write(|w| {
             w.set_pdwn(false);
@@ -280,7 +270,7 @@ impl<'d, T: Instance> Driver<'d, T> {
         #[cfg(time)]
         embassy_time::block_for(embassy_time::Duration::from_millis(100));
         #[cfg(not(time))]
-        cortex_m::asm::delay(unsafe { crate::rcc::get_freqs() }.sys.0 / 10);
+        cortex_m::asm::delay(unsafe { crate::rcc::get_freqs() }.sys.unwrap().0 / 10);
 
         #[cfg(not(usb_v4))]
         regs.btable().write(|w| w.set_btable(0));
@@ -647,7 +637,6 @@ impl<'d, T: Instance> driver::Bus for Bus<'d, T> {
 
 trait Dir {
     fn dir() -> Direction;
-    fn waker(i: usize) -> &'static AtomicWaker;
 }
 
 /// Marker type for the "IN" direction.
@@ -656,11 +645,6 @@ impl Dir for In {
     fn dir() -> Direction {
         Direction::In
     }
-
-    #[inline]
-    fn waker(i: usize) -> &'static AtomicWaker {
-        &EP_IN_WAKERS[i]
-    }
 }
 
 /// Marker type for the "OUT" direction.
@@ -668,11 +652,6 @@ pub enum Out {}
 impl Dir for Out {
     fn dir() -> Direction {
         Direction::Out
-    }
-
-    #[inline]
-    fn waker(i: usize) -> &'static AtomicWaker {
-        &EP_OUT_WAKERS[i]
     }
 }
 
@@ -1057,3 +1036,33 @@ impl<'d, T: Instance> driver::ControlPipe for ControlPipe<'d, T> {
         });
     }
 }
+
+pub(crate) mod sealed {
+    pub trait Instance {
+        fn regs() -> crate::pac::usb::Usb;
+    }
+}
+
+/// USB instance trait.
+pub trait Instance: sealed::Instance + RccPeripheral + 'static {
+    /// Interrupt for this USB instance.
+    type Interrupt: interrupt::typelevel::Interrupt;
+}
+
+// Internal PHY pins
+pin_trait!(DpPin, Instance);
+pin_trait!(DmPin, Instance);
+
+foreach_interrupt!(
+    ($inst:ident, usb, $block:ident, LP, $irq:ident) => {
+        impl sealed::Instance for crate::peripherals::$inst {
+            fn regs() -> crate::pac::usb::Usb {
+                crate::pac::$inst
+            }
+        }
+
+        impl Instance for crate::peripherals::$inst {
+            type Interrupt = crate::interrupt::typelevel::$irq;
+        }
+    };
+);

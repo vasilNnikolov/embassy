@@ -1,13 +1,10 @@
-use core::future::poll_fn;
 use core::slice;
-use core::sync::atomic::{AtomicBool, Ordering};
-use core::task::Poll;
+use core::sync::atomic::AtomicBool;
 
 use embassy_hal_internal::atomic_ring_buffer::RingBuffer;
 use embassy_sync::waitqueue::AtomicWaker;
 
 use super::*;
-use crate::interrupt::typelevel::Interrupt;
 
 /// Interrupt handler.
 pub struct InterruptHandler<T: BasicInstance> {
@@ -140,11 +137,15 @@ pub struct BufferedUart<'d, T: BasicInstance> {
 }
 
 /// Tx-only buffered UART
+///
+/// Created with [BufferedUart::split]
 pub struct BufferedUartTx<'d, T: BasicInstance> {
     phantom: PhantomData<&'d mut T>,
 }
 
 /// Rx-only buffered UART
+///
+/// Created with [BufferedUart::split]
 pub struct BufferedUartRx<'d, T: BasicInstance> {
     phantom: PhantomData<&'d mut T>,
 }
