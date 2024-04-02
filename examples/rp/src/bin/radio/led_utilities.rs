@@ -5,7 +5,7 @@ use embassy_time::{Duration, Ticker};
 use gpio::{AnyPin, Output};
 use {defmt_rtt as _, panic_probe as _};
 
-pub type LedType = Mutex<ThreadModeRawMutex, Option<Output<'static, AnyPin>>>;
+pub type LedType = Mutex<ThreadModeRawMutex, Option<Output<'static>>>;
 
 #[embassy_executor::task]
 pub async fn toggle_led(led: &'static LedType, delay: Duration) {
